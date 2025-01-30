@@ -103,17 +103,17 @@ pip install -r requirements.txt
 python hv.py --pref pref/mo-halfcheetah.npy --ref 0 -8000 --data rewards/FB/mo-halfcheetah.npy
 ```
 
-Config:
-* pref : preference set use on calculating hypervolumn(HV) and utility(UT).
-* ref : reference point on calculating hypervolumn.
-* data : testing rewards for calculating hypervolumn(HV) and utility(UT).
+* Config:
+  * pref : preference set use on calculating hypervolumn(HV) and utility(UT).
+  * ref : reference point on calculating hypervolumn.
+  * data : testing rewards for calculating hypervolumn(HV) and utility(UT).
 
 * How to Run ed.py? 
 
 ```python3
 python hv.py --pref pref/mo-halfcheetah.npy --base rewards/FB/mo-halfcheetah.npy --others rewards/Q-Pensieve/mo-halfcheetah.npy
 ```
-Config:
-* pref : preference set use on calculating Episodic Dominance(ED).
-* base : rewards used as base on calculating Episodic Dominance(ED).
-* others : rewards for calculating Episodic Dominance(ED).
+* Config:
+  * pref : preference set use on calculating Episodic Dominance(ED).
+  * base : rewards used as base on calculating Episodic Dominance(ED).
+  * others : rewards for calculating Episodic Dominance(ED).
