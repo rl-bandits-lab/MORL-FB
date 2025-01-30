@@ -205,7 +205,7 @@ class MORLAgent:
         return preference
     
     @torch.no_grad()
-    def inference_z(self, preference, eval=False) -> torch.Tensor:
+    def preference_guided_exploration(self, preference, eval=False) -> torch.Tensor:
 
         if self.steps < self.start_steps and not eval:
             z = self.sample_z(1)
@@ -247,7 +247,7 @@ class MORLAgent:
         state, _ = self.env.reset(seed=self.seed)
 
         preference = self.get_pref()
-        z = self.inference_z(preference)
+        z = self.preference_guided_exploration(preference)
         z = z.squeeze().cpu().numpy()
 
         while (not done) and (current_steps < self.env._max_episode_steps):
@@ -288,7 +288,7 @@ class MORLAgent:
 
     # used on calculating z for a batch of preference
     @torch.no_grad()
-    def inference_z_batch(self, preference):
+    def preference_guided_exploration_batch(self, preference):
 
         _, _, _, rewards, next_states, _, _ = self.z_memory.sample(self.inference_size)
         
@@ -318,10 +318,10 @@ class MORLAgent:
             rewards = reward2to3(next_states, rewards)
 
         if self.her:
-            zs = self.inference_z_batch(preferences)
+            zs = self.preference_guided_exploration_batch(preferences)
         else:
             pref = self.get_pref()
-            z = self.inference_z(pref)
+            z = self.preference_guided_exploration(pref)
             zs = z.repeat(self.batch_size, 1)
             zs = zs.to(self.device)
             preference = torch.FloatTensor(pref).to(self.device)
@@ -441,7 +441,7 @@ class MORLAgent:
     @torch.no_grad()
     def evaluation(self, preference_index):
         preference = self.PREF[preference_index]
-        z = self.inference_z(preference, eval=True)
+        z = self.preference_guided_exploration(preference, eval=True)
         z = z.squeeze().cpu().numpy()
 
         episode = 5
@@ -524,7 +524,7 @@ class MORLAgent:
 
     @torch.no_grad()
     def test(self, preference, episode=5):
-        z = self.inference_z(preference, eval=True)
+        z = self.preference_guided_exploration(preference, eval=True)
         z = z.squeeze().cpu().numpy()
         self.actor.eval()
 
