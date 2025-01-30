@@ -22,14 +22,12 @@ class DiscreteAgent:
 
         self.steps = 0
         self.episodes = 0
-        self.eval_time = 0
         self.start_steps = config['start_steps']
         self.num_steps = config['num_steps']
+        self.eval_steps = config['eval_steps']
+        self.save_steps = config['save_steps']
         self.save = config['save']
         self.lr = config['lr']
-
-        if self.save and not os.path.exists(self.log_path):
-            os.makedirs(self.log_path)
 
         self.embed_dim = config['z_dim']
         self.env_params = {}
@@ -46,25 +44,12 @@ class DiscreteAgent:
         self.seed = config['seed']
         self.inference_size = config['interface_size']
         self.update_interval = config['update_interval']
+        self.her = config['her']
         self.update_counter = 0
 
-        if self.env_params['rewards'] == 2:
-            self.p_name = ['9010', '8020', '7030', '6040', '5050',
-                           '4060', '3070', '2080', '1090']
-            self.PREF = [[0.9, 0.1], [0.8, 0.2], [0.7, 0.3], [0.6, 0.4], [0.5, 0.5],
-                         [0.4, 0.6], [0.3, 0.7], [0.2, 0.8], [0.1, 0.9]]
-        elif self.env_params['rewards'] == 3:
-            self.p_name = ['Average', '811', '181', '118']
-            self.PREF = [[0.333, 0.333, 0.334], [0.8, 0.1, 0.1], [
-                0.1, 0.8, 0.1], [0.1, 0.1, 0.8]]
-        elif self.env_params['rewards'] == 4:
-            self.p_name = ['Average', '7111', '1711', '1171', '1117']
-            self.PREF = [[0.25, 0.25, 0.25, 0.25], [0.7, 0.1, 0.1, 0.1], [
-                0.1, 0.7, 0.1, 0.1], [0.1, 0.1, 0.7, 0.1], [0.1, 0.1, 0.1, 0.7]]
-        else:
-            self.p_name = ['Average', '511111', '151111', '115111', '111511', '111151', '111115']
-            self.PREF = [[0.166, 0.166, 0.166, 0.166, 0.166, 0.17], [0.5, 0.1, 0.1, 0.1, 0.1, 0.1], [0.1, 0.5, 0.1, 0.1, 0.1, 0.1], [
-                0.1, 0.1, 0.5, 0.1, 0.1, 0.1], [0.1, 0.1, 0.1, 0.5, 0.1, 0.1], [0.1, 0.1, 0.1, 0.1, 0.5, 0.1], [0.1, 0.1, 0.1, 0.1, 0.1, 0.5]]            
+
+        if self.save and not os.path.exists(self.log_path):
+            os.makedirs(self.log_path)       
 
         np.random.seed(0)
         random.seed(0)
@@ -88,6 +73,24 @@ class DiscreteAgent:
 
         self.memory = MOMultiStepMemory(config['memory_size'], self.env.observation_space.shape, self.env_params['rewards'],
                                         self.env.action_space.shape, self.device, self.gamma)
+        
+        if self.env_params['rewards'] == 2:
+            self.p_name = ['9010', '8020', '7030', '6040', '5050',
+                           '4060', '3070', '2080', '1090']
+            self.PREF = [[0.9, 0.1], [0.8, 0.2], [0.7, 0.3], [0.6, 0.4], [0.5, 0.5],
+                         [0.4, 0.6], [0.3, 0.7], [0.2, 0.8], [0.1, 0.9]]
+        elif self.env_params['rewards'] == 3:
+            self.p_name = ['Average', '811', '181', '118']
+            self.PREF = [[0.333, 0.333, 0.334], [0.8, 0.1, 0.1], [
+                0.1, 0.8, 0.1], [0.1, 0.1, 0.8]]
+        elif self.env_params['rewards'] == 4:
+            self.p_name = ['Average', '7111', '1711', '1171', '1117']
+            self.PREF = [[0.25, 0.25, 0.25, 0.25], [0.7, 0.1, 0.1, 0.1], [
+                0.1, 0.7, 0.1, 0.1], [0.1, 0.1, 0.7, 0.1], [0.1, 0.1, 0.1, 0.7]]
+        elif self.env_params['rewards'] == 6:
+            self.p_name = ['Average', '511111', '151111', '115111', '111511', '111151', '111115']
+            self.PREF = [[0.166, 0.166, 0.166, 0.166, 0.166, 0.17], [0.5, 0.1, 0.1, 0.1, 0.1, 0.1], [0.1, 0.5, 0.1, 0.1, 0.1, 0.1], [
+                0.1, 0.1, 0.5, 0.1, 0.1, 0.1], [0.1, 0.1, 0.1, 0.5, 0.1, 0.1], [0.1, 0.1, 0.1, 0.1, 0.5, 0.1], [0.1, 0.1, 0.1, 0.1, 0.1, 0.5]]     
 
     def run(self) -> None:
         while True:
@@ -103,17 +106,15 @@ class DiscreteAgent:
 
     def train_episode(self) -> None:
         self.episodes += 1
-        episode_steps = 0
+        current_steps = 0
         episode_reward = 0
         done = False
         state, _ = self.env.reset(seed=self.seed)
 
         preference = self.get_pref()
-        z = self.inference_z(preference)
+        z = self.preference_guided_exploration(preference)
 
-
-
-        while not done:
+        while (not done) and current_steps < self.env._max_episode_steps:
             if self.steps < self.start_steps:
                 action = self.env.action_space.sample()
             else:
@@ -121,7 +122,7 @@ class DiscreteAgent:
             next_state, reward, done, _, _ = self.env.step(action)
 
             self.steps += 1
-            episode_steps += 1
+            current_steps += 1
             self.update_counter += 1
             episode_reward += reward
 
@@ -130,59 +131,50 @@ class DiscreteAgent:
 
             self.memory.append(
                 state, preference, action, reward, next_state, masked_done,
-                episode_done=done)
-            
+                episode_done=done, her=self.her)
 
             state = next_state
 
             if self.is_update():
                 if self.update_counter % self.update_interval == 0:
                     self.learn()
-                if self.steps > self.start_steps and self.steps % 10000 == 0:
-                    with torch.no_grad():
-                        self.eval_time += 1
-                        for i in range(len(self.PREF)):
-                            self.evaluation(i)
-                        time = 5
-                        if self.save and self.eval_time % time == 0:
-                            self.save_model(self.log_path, self.eval_time)
-
-            if episode_steps > self.env._max_episode_steps:
-                break
+                if self.steps % self.eval_steps == 0:
+                    for i in range(len(self.PREF)):
+                        self.evaluation(i)
+                    
+                if self.save and self.steps % self.save_steps == 0:
+                    self.save_model(self.log_path, self.steps)
 
 
     def is_update(self) -> bool:
         return len(self.memory) > self.batch_size and\
             self.steps >= self.start_steps
 
-    def sample_z(self, size, device="cpu"):
-        gaussian_rdv = torch.randn(size, self.embed_dim).to(device)
+    def sample_z(self, size) -> torch.Tensor:
+        gaussian_rdv = torch.randn(size, self.embed_dim).to(self.device)
         gaussian_rdv = Fun.normalize(gaussian_rdv, dim=1)
         z = math.sqrt(self.embed_dim) * gaussian_rdv
         return z
 
     @torch.no_grad()
-    def inference_z(self, preference, eval=False):
+    def preference_guided_exploration(self, preference, eval=False) -> torch.Tensor:
 
         if self.steps < self.start_steps and not eval:
-            z = self.sample_z(1, device=self.device)
+            z = self.sample_z(1)
             return z
 
-        states, _, actions, rewards, next_states, dones, episode_dones = self.memory.sample(
-            self.inference_size)
-              
+        _, _, _, rewards, next_states, _, _ = self.memory.sample(self.inference_size)
 
-        with torch.no_grad():
-            preference = torch.FloatTensor(preference).to(self.device)
-            prefs = preference.unsqueeze(0).repeat(self.inference_size, 1)
+        preference = torch.FloatTensor(preference).to(self.device)
+        prefs = preference.unsqueeze(0).repeat(self.inference_size, 1)
 
-            B = self.backward_map(next_states, prefs)
+        B = self.backward_map(next_states, prefs)
 
-            dot_reward = torch.einsum('sd, sd -> s', rewards, prefs)
-            dot_reward = dot_reward.unsqueeze(1)
+        dot_reward = torch.einsum('sd, sd -> s', rewards, prefs)
+        dot_reward = dot_reward.unsqueeze(1)
 
-            z = torch.matmul(dot_reward.T, B) / self.inference_size
-            z = math.sqrt(self.embed_dim) * Fun.normalize(z, dim=1)
+        z = torch.matmul(dot_reward.T, B) / self.inference_size
+        z = math.sqrt(self.embed_dim) * Fun.normalize(z, dim=1)
 
         return z
 
@@ -195,58 +187,51 @@ class DiscreteAgent:
         Q1, Q2 = [torch.einsum('sda,sd->sa', F, z) for F in [F1, F2]]
         Q = torch.min(Q1, Q2)
 
-        # using boltzmann exploration strategy to select action
         if not eval and np.random.rand() < 0.35:
-            # Q /= 0.1
-            # Q_prob = Fun.softmax(Q, dim=1)
-            # dist = torch.distributions.Categorical(probs=Q_prob)
-            # action = dist.sample().item()
             action = self.env.action_space.sample()
-
         else:
             action = Q.max(1)[1].item()
 
         return action
     
     @torch.no_grad()
-    def inference_z_batch(self, preference):
+    def preference_guided_exploration_batch(self, preference) -> torch.Tensor:
 
-        states, _, actions, rewards, next_states, dones, episode_dones = self.memory.sample(
+        _, _, _, rewards, next_states, _, _ = self.memory.sample(
             self.inference_size)
         
         rewards = rewards.unsqueeze(1).repeat(1, self.batch_size, 1)
 
-        bnext_states = next_states.repeat(self.batch_size, 1)
+        next_states_batch = next_states.repeat(self.batch_size, 1)
         
 
-        with torch.no_grad():
-            bprefs = preference.repeat(self.inference_size, 1)
-            prefs = preference.unsqueeze(0).repeat(self.inference_size, 1, 1)
+        prefs_batch = preference.repeat(self.inference_size, 1)
+        prefs = preference.unsqueeze(0).repeat(self.inference_size, 1, 1)
 
-            B = self.backward_map(bnext_states, bprefs)
+        B = self.backward_map(next_states_batch, prefs_batch)
 
-            B = B.view(self.inference_size, self.batch_size, self.embed_dim)
+        B = B.view(self.inference_size, self.batch_size, self.embed_dim)
 
+        dot_reward = torch.einsum('isd, isd -> is', rewards, prefs)
 
-            dot_reward = torch.einsum('isd, isd -> is', rewards, prefs)
-
-            z = torch.einsum('is, isk -> sk', dot_reward, B) / self.inference_size
-            z = math.sqrt(self.embed_dim) * Fun.normalize(z, dim=1)
+        z = torch.einsum('is, isk -> sk', dot_reward, B) / self.inference_size
+        z = math.sqrt(self.embed_dim) * Fun.normalize(z, dim=1)
 
         return z
 
     def learn(self) -> None:
         states, preferences, actions, rewards, next_states, dones, episode_dones = self.memory.sample(
             self.batch_size)
-
-        # z = []
-        # for p in preferences:
-        #     pref = p.cpu().numpy()
-        #     z.append(self.inference_z(pref, eval=True))
-
-        # zs = torch.stack(z).squeeze()
-
-        zs = self.inference_z_batch(preferences)
+        
+        if self.her:
+            zs = self.preference_guided_exploration_batch(preferences)
+        else:
+            pref = self.get_pref()
+            z = self.preference_guided_exploration(pref)
+            zs = z.repeat(self.batch_size, 1)
+            zs = zs.to(self.device)
+            preference = torch.FloatTensor(pref).to(self.device)
+            preferences = preference.unsqueeze(0).repeat(self.batch_size, 1)
 
         self.update_fb(states, actions, rewards,
                        next_states, dones, episode_dones, zs, preferences)
@@ -263,16 +248,6 @@ class DiscreteAgent:
             next_Q1, next_Q2 = [torch.einsum(
                 'sda,sd->sa', F, zs) for F in [target_F1, target_F2]]
             next_Q = torch.min(next_Q1, next_Q2)
-
-            # next_action = next_Q.max(1)[1]
-
-            # next_Q = next_Q.max(1)[0]
-
-            # next_idx = next_action[:, None].repeat(
-            #     1, self.embed_dim)[:, :, None]
-
-            # target_F1, target_F2 = [
-            #     Fi.gather(-1, next_idx).squeeze() for Fi in [target_F1, target_F2]]
 
             pi = Fun.softmax(next_Q/0.1, dim=1)
 
@@ -305,10 +280,7 @@ class DiscreteAgent:
         Q1, Q2 = [torch.einsum('sd, sd->s', F, zs) for F in [F1, F2]]
 
 
-        Q_loss = Fun.mse_loss(Q1, target_Q, reduction='sum') + \
-            Fun.mse_loss(Q2, target_Q, reduction='sum')
-        
-        # Q_loss = Fun.smooth_l1_loss(Q1, target_Q) + Fun.smooth_l1_loss(Q2, target_Q)
+        Q_loss = Fun.mse_loss(Q1, target_Q, reduction='sum') + Fun.mse_loss(Q2, target_Q, reduction='sum')
 
         I = torch.eye(*M1.size(), device=M1.device)
         off_diag = ~I.bool()
@@ -353,28 +325,27 @@ class DiscreteAgent:
                 "loss/orth_offdiag": orth_loss_offdiag.item(),
                  "loss/orth": orth_loss.item(),
                  "steps": self.steps, })
+            
 
+    @torch.no_grad()
     def evaluation(self, preference_index):
         preference = self.PREF[preference_index]
-        episode = 3
+        episode = 5
         returns = np.zeros((episode, self.env_params['rewards']))
 
         for i in range(episode):
-            z = self.inference_z(preference, eval=True)
+            z = self.preference_guided_exploration(preference, eval=True)
             state, _ = self.test_env.reset(seed=i)
             done = False
             episode_reward = np.zeros(self.env_params['rewards'])
-            episode_steps = 0
+            current_steps = 0
 
-            while not done:
+            while (not done) and current_steps < self.test_env._max_episode_steps:
                 action = self.get_action(state, z, eval=True)
                 next_state, reward, done, _, _ = self.test_env.step(action)
                 state = next_state
                 episode_reward += reward
-                episode_steps += 1
-
-                if episode_steps > self.test_env._max_episode_steps:
-                    break
+                current_steps += 1
 
             returns[i] = episode_reward
 
@@ -415,21 +386,18 @@ class DiscreteAgent:
         returns = np.zeros((episode, self.env_params['rewards']))
 
         for i in range(episode):
-            z = self.inference_z(preference, eval=True)
+            z = self.preference_guided_exploration(preference, eval=True)
             state, _ = self.test_env.reset(seed=i)
             done = False
             episode_reward = np.zeros(self.env_params['rewards'])
-            episode_steps = 0
+            current_steps = 0
 
-            while not done:
+            while (not done) and current_steps < self.test_env._max_episode_steps:
                 action = self.get_action(state, z, eval=True)
                 next_state, reward, done, _, _ = self.test_env.step(action)
                 state = next_state
                 episode_reward += reward
-                episode_steps += 1
-
-                if episode_steps > self.test_env._max_episode_steps:
-                    break
+                current_steps += 1
 
             returns[i] = episode_reward
 
@@ -437,3 +405,5 @@ class DiscreteAgent:
 
         print(
             f'Preference: {preference} => Reward: {dot_reward}, Returns: {returns.mean(axis=0)}')
+        
+        return returns, dot_reward

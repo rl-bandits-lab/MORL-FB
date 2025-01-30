@@ -9,23 +9,31 @@ from torch.distributions import Normal
 
 
 class BackwardMap(nn.Module):
-    def __init__(self, env_params, embed_dim):
+    def __init__(self, env_params, embed_dim, used_preference: bool = True):
         super(BackwardMap, self).__init__()
-        self.fc1 = nn.Linear(env_params['obs'] + env_params['rewards'], 256)
-        self.fc2 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(256, 256)
+        self.layer_size = 512
+        self.used_preference = used_preference
+        if used_preference:
+            self.fc1 = nn.Linear(env_params['obs'] + env_params['rewards'], self.layer_size)
+        else:
+            self.fc1 = nn.Linear(env_params['obs'], self.layer_size)
+        self.fc2 = nn.Linear(self.layer_size, self.layer_size)
+        self.fc3 = nn.Linear(self.layer_size, self.layer_size)
         self.tanh = nn.Tanh()
-        self.backward_out = nn.Linear(256, embed_dim)
+        self.backward_out = nn.Linear(self.layer_size, embed_dim)
         self.embed_dim = embed_dim
 
         self.apply(utils.weight_init)
 
-    def forward(self, x, pref):
-        x = torch.cat([x, pref], dim=-1)
+    def forward(self, obs, pref):
+        if self.used_preference:
+            x = torch.cat([obs, pref], dim=-1)
+        else:
+            x = obs
         x = F.relu(self.fc1(x), inplace=True)
-        x = F.relu(self.fc2(x), inplace=True)
-        x = self.fc3(x)
+        x = self.fc2(x)
         x = self.tanh(x)
+        x = F.relu(self.fc3(x), inplace=True)
         B = self.backward_out(x)
 
         B = math.sqrt(self.embed_dim) * F.normalize(B, dim=1)
@@ -36,13 +44,14 @@ class ForwardMap(nn.Module):
     def __init__(self, env_params, embed_dim):
         super(ForwardMap, self).__init__()
         self.embed_dim = embed_dim
+        self.layer_size = 512
         self.num_actions = env_params['action']
-        self.fc1 = nn.Linear(env_params['obs'] + embed_dim, 256)
-        self.fc2 = nn.Linear(256, 256)
-        self.fc3 = nn.Linear(256, 256)
-
-        self.f1 = nn.Linear(256, embed_dim * env_params['action'])
-        self.f2 = nn.Linear(256, embed_dim * env_params['action'])
+        self.fc1 = nn.Linear(env_params['obs'] + embed_dim, self.layer_size)
+        self.fc2 = nn.Linear(self.layer_size, self.layer_size)
+        self.fc3 = nn.Linear(self.layer_size, self.layer_size)
+        self.tanh = nn.Tanh()
+        self.f1 = nn.Linear(self.layer_size, embed_dim * env_params['action'])
+        self.f2 = nn.Linear(self.layer_size, embed_dim * env_params['action'])
 
         self.apply(utils.weight_init)
 
@@ -51,7 +60,8 @@ class ForwardMap(nn.Module):
         #                    keepdim=True) ** 2 / self.embed_dim)
         x = torch.cat([obs, w], dim=1)
         x = F.relu(self.fc1(x), inplace=True)
-        x = F.relu(self.fc2(x), inplace=True)
+        x = self.fc2(x)
+        x = self.tanh(x)
         x = F.relu(self.fc3(x), inplace=True)
         f1 = self.f1(x)
         f2 = self.f2(x)

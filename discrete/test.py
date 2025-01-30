@@ -1,57 +1,59 @@
 from agent import DiscreteAgent
 import mo_gymnasium
 import os
-import wandb
 import numpy as np
 import time
 import torch.nn.functional as F
 import torch
+from tqdm import tqdm
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--cuda_device', type=int, default=0)
+parser.add_argument('--env_name', type=str, default='deep-sea-treasure-v0')
+parser.add_argument('--time_str', type=str, default='')
+args = parser.parse_args()
 
 if __name__ == '__main__':
-    # env_name = "mo-reacher-v4"
-    env_name = "deep-sea-treasure-v0"
-    # env_name = "minecart-v0"
-    # env_name = "mo-lunar-lander-v2"
-    # env_name = "mo-highway-v0"
 
     configs = {
-        'num_steps': 1505000,
+        'num_steps': 1005000,
         'start_steps': 10000,
+        'eval_steps': 10000,
+        'save_steps': 50000,
         'memory_size': 1000000,
         'save': False,
-        'z_dim': 150,
+        'z_dim': 100,
         'interface_size': 1024,
         'batch_size': 256,
         'tau': 0.005,
-        'gamma': 0.99,
+        'gamma': 0.995,
         'lr': 3e-4,
-        'seed': 10,
-        'update_interval': 3,
+        'seed': args.seed,
+        'update_interval': 5,
+        'her': True
     }
 
-    env = mo_gymnasium.make(env_name, max_episode_steps=50)
-    test_env = mo_gymnasium.make(env_name, max_episode_steps=50)
 
-    time_str = "20250112-220823"
+    env = mo_gymnasium.make(args.env_name, max_episode_steps=50)
+    test_env = mo_gymnasium.make(args.env_name, max_episode_steps=50)
 
-    name = f'{env_name}_calculate_all_z_HER_no_goal_sum_boltzmann_epsilon_delay_update'
-
-    project_name = 'FB_MORL_Discrete'
+    name = f'MORL-FB_{args.env_name}'
 
 
-    path = os.path.join(f'log/{env_name}', time_str)
-    path = os.path.join(path, name)
-
+    path = os.path.join(f'log/{args.env_name}', f'{args.time_str}_{name}')
     agent = DiscreteAgent(env, test_env, configs, path)
 
-    agent.load_model(path, 130)
+    agent.load_model(path, 1000000)
 
-    p_name = ['9010', '8020', '7030', '6040', '5050',
-                           '4060', '3070', '2080', '1090']
-    PREF = [[0.9, 0.1], [0.8, 0.2], [0.7, 0.3], [0.6, 0.4], [0.5, 0.5],
-                         [0.4, 0.6], [0.3, 0.7], [0.2, 0.8], [0.1, 0.9]]
+    prefs = np.load('prefs/dst.npy')
 
-    for i in range(9):
-        agent.test(PREF[i])
 
+    all_rewards = []
+
+    for p in tqdm(prefs):
+        reward, _ = agent.test(p)
+        all_rewards.append(reward)
+
+    np.save(f'rewards/MORL-FB/{name}', all_rewards)
 

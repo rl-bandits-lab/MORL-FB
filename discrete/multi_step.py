@@ -56,11 +56,12 @@ class MOMultiStepMemory(MOMemory):
         self.gamma = gamma
 
     def append(self, state, preference, action, reward, next_state, done,
-               episode_done=False):
+               episode_done=False, her=False):
         self._append(state, preference, action, reward, next_state, done)
-        for _ in range(3):
-            new_pref = self.get_pref()
-            self._append(state, new_pref, action, reward, next_state, done)
+        if her:
+            for _ in range(3):
+                new_pref = self.get_pref()
+                self._append(state, new_pref, action, reward, next_state, done)
 
     def get_pref(self) -> np.ndarray:
         preference = np.random.dirichlet(np.ones(self.reward_shape))

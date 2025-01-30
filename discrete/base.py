@@ -10,7 +10,6 @@ class MOMemory:
         self.action_shape = action_shape
         self.reward_shape = reward_shape
         self.preference_shape = reward_shape
-        self.zs_shape = reward_shape
         self.device = device
         self.is_image = len(state_shape) == 3
         self.state_type = np.uint8 if self.is_image else np.float32
@@ -30,7 +29,6 @@ class MOMemory:
         self.actions[self._p] = action
         self.rewards[self._p] = reward
         self.preferences[self._p] = preference
-        # self.zs[self._p] = z
         self.next_states[self._p] = next_state
         self.dones[self._p] = done
 
@@ -72,7 +70,6 @@ class MOMemory:
         rewards = torch.FloatTensor(self.rewards[indices]).to(self.device)
         preferences = torch.FloatTensor(
             self.preferences[indices]).to(self.device)
-        # zs = torch.FloatTensor(self.zs[indices]).to(self.device)
 
         dones = torch.FloatTensor(self.dones[indices]).to(self.device)
 
@@ -93,8 +90,6 @@ class MOMemory:
             (self.capacity, self.reward_shape), dtype=np.float32)
         self.preferences = np.empty(
             (self.capacity, self.reward_shape), dtype=np.float32)
-        # self.zs = np.empty(
-        #     (self.capacity, self.reward_shape), dtype=np.float32)
         self.next_states = np.empty(
             (self.capacity, *self.state_shape), dtype=self.state_type)
         self.dones = np.empty(
@@ -130,7 +125,6 @@ class MOMemory:
         states, preferences, actions, rewards, next_states, dones = batch
         self.states[mem_indices] = states[batch_indices]
         self.preferences[mem_indices] = preferences[batch_indices]
-        # self.zs[mem_indices] = zs[batch_indices]
         self.actions[mem_indices] = actions[batch_indices]
         self.rewards[mem_indices] = rewards[batch_indices]
         self.next_states[mem_indices] = next_states[batch_indices]
