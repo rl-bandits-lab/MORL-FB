@@ -284,7 +284,7 @@ class MORLAgent:
                         self.actor.train()
 
                 if self.save and self.steps % self.save_steps == 0:
-                    self.save_model(self.log_path, self.steps//self.save_steps)
+                    self.save_model(self.log_path, self.steps)
 
     # used on calculating z for a batch of preference
     @torch.no_grad()

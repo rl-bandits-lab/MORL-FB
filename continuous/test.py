@@ -1,24 +1,23 @@
 import mo_gymnasium
 import os
-import wandb
 from mo_agent import MORLAgent
 import numpy as np
 import time
-import torch.nn.functional as F
+import tqdm
 import torch
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--seed', type=int, default=10)
 parser.add_argument('--cuda_device', type=int, default=0)
 parser.add_argument('--env_name', type=str, default='mo-halfcheetah-v4')
-parser.add_argument('--project_name', type=str, default='MORL-FB')
+parser.add_argument('--time_str', type=str, default='')
 args = parser.parse_args()
+
 
 if __name__ == '__main__':
 
     configs = {
-        'num_steps': 3010000,
+        'num_steps': 3000000,
         'start_steps': 10000,
         'memory_size': 1000000,
         'save': True,
@@ -45,7 +44,7 @@ if __name__ == '__main__':
         'device_id': args.cuda_device,
         'seed': args.seed,
     }
-    
+
     if args.env_name == 'mo-halfcheetah-v4':
         env = mo_gymnasium.make(args.env_name, max_episode_steps=1000)
         test_env = mo_gymnasium.make(args.env_name, max_episode_steps=1000)
@@ -53,14 +52,21 @@ if __name__ == '__main__':
         env = mo_gymnasium.make(args.env_name, healthy_reward=1.0, max_episode_steps=1000)
         test_env = mo_gymnasium.make(args.env_name, healthy_reward=1.0, max_episode_steps=1000)
 
-    time_str = time.strftime("%Y%m%d-%H%M%S")
-
     name = f'MORL-FB_{args.env_name}'
 
-    wandb.init(project=args.project_name, name=f'{time_str}_{name}', config=configs)
 
-    path = os.path.join(f'log/{args.env_name}', f'{time_str}_{name}')
+    path = os.path.join(f'log/{args.env_name}', f'{args.time_str}_{name}')
+    agent = MORLAgent(env, test_env, configs, path=path, wandb=None)
 
-    agent = MORLAgent(env, test_env, configs, path=path, wandb=wandb)
+    agent.load_model(path, 3000000)
 
-    agent.run()
+    prefs = np.load(f'prefs/{args.env_name}.npy')
+
+    all_rewards = []
+
+    for p in tqdm(prefs):
+        reward = agent.test(p)
+        all_rewards.append(reward)
+
+    np.save(f'rewards/MORL-FB/{name}.npy', all_rewards)
+
