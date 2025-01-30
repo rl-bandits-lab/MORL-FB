@@ -5,7 +5,7 @@
 
 ### Code Structure
 
-```
+```bash
 discrete/
     ├── agent.py --- the training agent of discrete MORL-FB
     ├── base.py --- the structure of trajectory replay buffer
@@ -18,13 +18,12 @@ discrete/
     └── utils.py --- utility functions
 ```
 
-
-
 First of all, go to discrete directory
 
-```
+```bash
 cd discrete
 ```
+
 ### Requirements
 * Python version : tested in Python 3.9.16
 * Operation Systems : Ubuntu 20.04
@@ -32,20 +31,22 @@ cd discrete
 
 Install other required packages:
 
-```
+```bash
 pip install -r requirements.txt
 ```
+
 ### Usage
 * How to Run ? 
 
-```python
+```python3
 python main.py --env_name "deep-sea-treasure-v0" --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
 
 ## Continuous Environment
 
 ### Code Structure
-```
+
+```bash
 continuous/
     ├── base.py --- the structure of trajectory replay buffer
     ├── main.py --- main execution file for MORL-FB algorithms
@@ -61,7 +62,7 @@ continuous/
 
 First of all, go to continuous directory
 
-```
+```bash
 cd continuous
 ```
 
@@ -72,14 +73,14 @@ cd continuous
 
 Install other required packages:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 
 ### Usage
 * How to Run ? 
 
-```python
+```python3
 python main.py --env_name "mo-halfcheetah-v4" --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
 
@@ -92,13 +93,13 @@ python main.py --env_name "mo-halfcheetah-v4" --seed 10 --cuda_device 0 --projec
 
 Install other required packages:
 
-```
+```bash
 pip install -r requirements.txt
 ```
 ### Usage
 * How to Run hv.py? 
 
-```python
+```python3
 python hv.py --pref pref/mo-halfcheetah.npy --ref 0 -8000 --data rewards/FB/mo-halfcheetah.npy
 ```
 
@@ -109,7 +110,7 @@ Config:
 
 * How to Run ed.py? 
 
-```python
+```python3
 python hv.py --pref pref/mo-halfcheetah.npy --base rewards/FB/mo-halfcheetah.npy --others rewards/Q-Pensieve/mo-halfcheetah.npy
 ```
 Config:
