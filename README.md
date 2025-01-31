@@ -42,6 +42,12 @@ pip install -r requirements.txt
 python main.py --env_name deep-sea-treasure-v0 --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
 
+* Config:
+  * env_name : environment name for training
+  * seed : random seed
+  * cuda_device : cuda device id
+  * project_name : wandb project name
+
 * How to Test ?
 
   * Model will be saved in format /log/{environment_name}/{time_str}\_MORL-FB_{environment_name}/model_{steps}.pth
@@ -100,6 +106,13 @@ pip install -r requirements.txt
 ```python3
 python main.py --env_name mo-halfcheetah-v4 --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
+
+* Config:
+  * env_name : environment name for training
+  * seed : random seed
+  * cuda_device : cuda device id
+  * project_name : wandb project name
+  * 
 
 * Tested Environment name
   * Halfcheetah2d : mo-halfcheetah-v4
