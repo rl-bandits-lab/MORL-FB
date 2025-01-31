@@ -18,7 +18,7 @@ class MOHumanoid5dEnv(HumanoidEnv, EzPickle):
     - 1: Control cost of the action
     """
 
-    def __init__(self, high_dim=False, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
         EzPickle.__init__(self, **kwargs)
         self.reward_space = Box(low=-np.inf, high=np.inf, shape=(5,))
