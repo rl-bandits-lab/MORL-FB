@@ -7,7 +7,7 @@ import time
 import torch.nn.functional as F
 import torch
 import argparse
-from environments import mo_humanoid5d
+from environments import mo_hopper2d, mo_hopper4d, mo_humanoid5d
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--seed', type=int, default=10)
