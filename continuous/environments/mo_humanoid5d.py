@@ -6,17 +6,6 @@ from gymnasium import register
 
 
 class MOHumanoid5dEnv(HumanoidEnv, EzPickle):
-    """
-    ## Description
-    Multi-objective version of the HumanoidEnv environment.
-
-    See [Gymnasium's env](https://gymnasium.farama.org/environments/mujoco/humanoid/) for more information.
-
-    ## Reward Space
-    The reward is 2-dimensional:
-    - 0: Reward for running forward (x-velocity)
-    - 1: Control cost of the action
-    """
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)

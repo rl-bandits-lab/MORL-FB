@@ -1,6 +1,6 @@
 numpy
 torch
-gymnasium[mujoco]
+gymnasium
 mo_gymnasium
 wandb
 argparse

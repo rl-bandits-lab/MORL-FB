@@ -39,8 +39,24 @@ pip install -r requirements.txt
 * How to Run ? 
 
 ```python3
-python main.py --env_name "deep-sea-treasure-v0" --seed 10 --cuda_device 0 --project_name "MORL-FB"
+python main.py --env_name deep-sea-treasure-v0 --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
+
+* How to Test ?
+
+  * Model will be saved in format /log/{environment_name}/{time_str}_MORL-FB_{environment_name}/model_{steps}.pth
+
+```python3
+python test.py --env_name deep-sea-treasure-v0 --model_name {time_str}_MORL-FB_{environment_name} --steps 3000000 --output_path rewards/MORL-FB/output.npy --cuda_device 0
+```
+
+* Config:
+  * env_name : environment name for testing
+  * model_name :  model directory name
+  * steps : model steps for file name
+  * output_path : path for saving testing results
+  * cuda_device : cuda device id
+
 
 ## Continuous Environment
 
@@ -82,7 +98,7 @@ pip install -r requirements.txt
 * How to Run ? 
 
 ```python3
-python main.py --env_name "mo-halfcheetah-v4" --seed 10 --cuda_device 0 --project_name "MORL-FB"
+python main.py --env_name mo-halfcheetah-v4 --seed 10 --cuda_device 0 --project_name "MORL-FB"
 ```
 
 * Tested Environment name
@@ -94,6 +110,21 @@ python main.py --env_name "mo-halfcheetah-v4" --seed 10 --cuda_device 0 --projec
   * Ant3d : mo-ant-v4
   * Humanoid2d : mo-humanoid-v4
   * Humanoid5d : mo-humanoid5d-v0
+
+* How to Test ?
+
+  * Model will be saved in format /log/{environment_name}/{time_str}_MORL-FB_{environment_name}/model_{steps}.pth
+
+```python3
+python test.py --env_name deep-sea-treasure-v0 --model_name {time_str}_MORL-FB_{environment_name} --steps 3000000 --output_path rewards/MORL-FB/output.npy --cuda_device 0
+```
+
+* Config:
+  * env_name : environment name for testing
+  * model_name :  model directory name
+  * steps : model steps for file name
+  * output_path : path for saving testing results
+  * cuda_device : cuda device id
 
 ## Evaluation Metrics Calculation
 

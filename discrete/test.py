@@ -9,9 +9,11 @@ from tqdm import tqdm
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cuda_device', type=int, default=0)
-parser.add_argument('--env_name', type=str, default='deep-sea-treasure-v0')
-parser.add_argument('--time_str', type=str, default='')
+parser.add_argument('--cuda_device', type=int, default=0, help='cuda device id')
+parser.add_argument('--env_name', type=str, default='deep-sea-treasure-v0', help='environment name')
+parser.add_argument('--model_name', type=str, default='', help='model directory name')
+parser.add_argument('--steps', type=int, default=1000000, help='model steps for file name')
+parser.add_argument('--output_path', type=str, default='rewards/MORL-FB/output.npy', help='path for saving testing results')
 args = parser.parse_args()
 
 if __name__ == '__main__':
@@ -38,16 +40,13 @@ if __name__ == '__main__':
     env = mo_gymnasium.make(args.env_name, max_episode_steps=50)
     test_env = mo_gymnasium.make(args.env_name, max_episode_steps=50)
 
-    name = f'MORL-FB_{args.env_name}'
 
-
-    path = os.path.join(f'log/{args.env_name}', f'{args.time_str}_{name}')
+    path = os.path.join(f'log/{args.env_name}', f'{args.model_name}')
     agent = DiscreteAgent(env, test_env, configs, path)
 
-    agent.load_model(path, 1000000)
+    agent.load_model(path, args.steps)
 
     prefs = np.load(f'prefs/{args.env_name}.npy')
-
 
     all_rewards = []
 
@@ -55,5 +54,5 @@ if __name__ == '__main__':
         reward, _ = agent.test(p)
         all_rewards.append(reward)
 
-    np.save(f'rewards/MORL-FB/{name}', all_rewards)
+    np.save(f'{args.output_path}', all_rewards)
 

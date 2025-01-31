@@ -9,10 +9,10 @@ import torch
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--seed', type=int, default=10)
-parser.add_argument('--cuda_device', type=int, default=0)
-parser.add_argument('--env_name', type=str, default='deep-sea-treasure-v0')
-parser.add_argument('--project_name', type=str, default='MORL-FB')
+parser.add_argument('--seed', type=int, default=10, help='random seed')
+parser.add_argument('--cuda_device', type=int, default=0, help='cuda device id')
+parser.add_argument('--env_name', type=str, default='deep-sea-treasure-v0', help='environment name')
+parser.add_argument('--project_name', type=str, default='MORL-FB', help='wandb project name')
 args = parser.parse_args()
 
 

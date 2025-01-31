@@ -8,9 +8,11 @@ import torch
 import argparse
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--cuda_device', type=int, default=0)
-parser.add_argument('--env_name', type=str, default='mo-halfcheetah-v4')
-parser.add_argument('--time_str', type=str, default='')
+parser.add_argument('--cuda_device', type=int, default=0, help='cuda device id')
+parser.add_argument('--env_name', type=str, default='mo-halfcheetah-v4', help='environment name')
+parser.add_argument('--model_name', type=str, default='', help='model name')
+parser.add_argument('--steps', type=int, default=3000000, help='model steps')
+parser.add_argument('--output_path', type=str, default='rewards/MORL-FB/output.npy', help='path for saving testing results')
 args = parser.parse_args()
 
 
@@ -52,13 +54,12 @@ if __name__ == '__main__':
         env = mo_gymnasium.make(args.env_name, healthy_reward=1.0, max_episode_steps=1000)
         test_env = mo_gymnasium.make(args.env_name, healthy_reward=1.0, max_episode_steps=1000)
 
-    name = f'MORL-FB_{args.env_name}'
 
 
-    path = os.path.join(f'log/{args.env_name}', f'{args.time_str}_{name}')
+    path = os.path.join(f'log/{args.env_name}', f'{args.model_name}')
     agent = MORLAgent(env, test_env, configs, path=path, wandb=None)
 
-    agent.load_model(path, 3000000)
+    agent.load_model(path, args.steps)
 
     prefs = np.load(f'prefs/{args.env_name}.npy')
 
@@ -68,5 +69,5 @@ if __name__ == '__main__':
         reward = agent.test(p)
         all_rewards.append(reward)
 
-    np.save(f'rewards/MORL-FB/{name}.npy', all_rewards)
+    np.save(f'{args.output_path}', all_rewards)
 

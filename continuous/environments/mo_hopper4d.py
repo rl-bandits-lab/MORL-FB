@@ -6,24 +6,6 @@ from gymnasium import register
 
 
 class MOHopperEnv(HopperEnv, EzPickle):
-    """
-    ## Description
-    Multi-objective version of the HopperEnv environment.
-
-    See [Gymnasium's env](https://gymnasium.farama.org/environments/mujoco/hopper/) for more information.
-
-    The original Gymnasium's 'Hopper-v4' is recovered by the following linear scalarization:
-
-    env = mo_gym.make('mo-hopper-v4', cost_objective=False)
-    LinearReward(env, weight=np.array([1.0, 0.0]))
-
-    ## Reward Space
-    The reward is 3-dimensional:
-    - 0: Reward for going forward on the x-axis
-    - 1: Reward for jumping high on the z-axis
-    - 2: Control cost of the action
-    If the cost_objective flag is set to False, the reward is 2-dimensional, and the cost is added to other objectives.
-    """
 
     def __init__(self, cost_objective=True, **kwargs):
         super().__init__(**kwargs)
