@@ -46,7 +46,7 @@ if __name__ == '__main__':
 
     agent.load_model(path, 1000000)
 
-    prefs = np.load('prefs/dst.npy')
+    prefs = np.load(f'prefs/{args.env_name}.npy')
 
 
     all_rewards = []
