@@ -44,7 +44,7 @@ python main.py --env_name deep-sea-treasure-v0 --seed 10 --cuda_device 0 --proje
 
 * How to Test ?
 
-  * Model will be saved in format /log/{environment_name}/{time_str}_MORL-FB_{environment_name}/model_{steps}.pth
+  * Model will be saved in format /log/{environment_name}/{time_str}\_MORL-FB_{environment_name}/model_{steps}.pth
 
 ```python3
 python test.py --env_name deep-sea-treasure-v0 --model_name {time_str}_MORL-FB_{environment_name} --steps 3000000 --output_path rewards/MORL-FB/output.npy --cuda_device 0
@@ -113,7 +113,7 @@ python main.py --env_name mo-halfcheetah-v4 --seed 10 --cuda_device 0 --project_
 
 * How to Test ?
 
-  * Model will be saved in format /log/{environment_name}/{time_str}_MORL-FB_{environment_name}/model_{steps}.pth
+  * Model will be saved in format /log/{environment_name}/{time_str}\_MORL-FB_{environment_name}/model_{steps}.pth
 
 ```python3
 python test.py --env_name deep-sea-treasure-v0 --model_name {time_str}_MORL-FB_{environment_name} --steps 3000000 --output_path rewards/MORL-FB/output.npy --cuda_device 0
