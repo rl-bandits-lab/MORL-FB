@@ -66,8 +66,8 @@ if __name__ == '__main__':
     all_rewards = []
 
     for p in tqdm(prefs):
-        reward = agent.test(p)
-        all_rewards.append(reward)
+        dot_reward, all_reward = agent.test(p)
+        all_rewards.append(all_reward)
 
     np.save(f'{args.output_path}', all_rewards)
 

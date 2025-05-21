@@ -506,19 +506,19 @@ class MORLAgent:
 
     def load_model(self, path, num):
         self.actor.load_state_dict(torch.load(
-            os.path.join(path, f'actor_{num}.pth'), map_location=f'cuda:{self.device}'))
+            os.path.join(path, f'actor_{num}.pth'), map_location=f'{self.device}'))
         self.forward_net.load_state_dict(torch.load(
-            os.path.join(path, f'forward_net_{num}.pth'), map_location=f'cuda:{self.device}'))
+            os.path.join(path, f'forward_net_{num}.pth'), map_location=f'{self.device}'))
         self.backward_net.load_state_dict(torch.load(
-            os.path.join(path, f'backward_net_{num}.pth'), map_location=f'cuda:{self.device}'))
+            os.path.join(path, f'backward_net_{num}.pth'), map_location=f'{self.device}'))
         self.forward_target_net.load_state_dict(torch.load(
-            os.path.join(path, 'forward_target_net.pth'), map_location=f'cuda:{self.device}'))
+            os.path.join(path, 'forward_target_net.pth'), map_location=f'{self.device}'))
         self.backward_target_net.load_state_dict(torch.load(
-            os.path.join(path, 'backward_target_net.pth'), map_location=f'cuda:{self.device}'))
+            os.path.join(path, 'backward_target_net.pth'), map_location=f'{self.device}'))
         self.memory = torch.load(os.path.join(
-            path, 'memory.pth'), map_location=f'cuda:{self.device}')
+            path, 'memory.pth'), map_location=f'{self.device}')
         self.z_memory = torch.load(os.path.join(
-            path, 'z_memory.pth'), map_location=f'cuda:{self.device}')
+            path, 'z_memory.pth'), map_location=f'{self.device}')
         self.memory.device = self.device
         self.z_memory.device = self.device
 
