@@ -19,13 +19,14 @@ class MORLAgent:
         self.action_max = self.env.action_space.high[0]
         self.action_min = self.env.action_space.low[0]
         self.reward_dim = self.env.reward_dim
-
-        np.random.seed(0)
-        random.seed(0)
-        torch.manual_seed(0)
-        torch.cuda.manual_seed(0)
-        torch.cuda.manual_seed_all(0)
-        self.env.action_space.seed(0)
+        
+        self.seed = config['seed']
+        np.random.seed(self.seed)
+        random.seed(self.seed)
+        torch.manual_seed(self.seed)
+        torch.cuda.manual_seed(self.seed)
+        torch.cuda.manual_seed_all(self.seed)
+        self.env.action_space.seed(self.seed)
 
         self.wandb = wandb
         self.save = config['save']
@@ -48,7 +49,6 @@ class MORLAgent:
         self.expl_scale = config['expl_scale']
         self.policy_scale = config['policy_scale']
         self.q_loss_coef = config['q_loss_coef']
-        self.seed = config['seed']
 
         self.tuning = config['tuning']
         self.her = config['her']
@@ -178,11 +178,6 @@ class MORLAgent:
         dist = self.actor_target(state, z, stddev)
 
         action = dist.sample(clip=self.clip)
-
-        noise = torch.randn_like(action)
-        noise = torch.clamp(noise, -0.25, 0.25)
-        action = action + noise
-
         action = torch.clamp(action, self.action_min, self.action_max)
 
         return action
@@ -244,7 +239,7 @@ class MORLAgent:
         current_steps = 0
         episode_reward = 0
         done = False
-        state, _ = self.env.reset(seed=self.seed)
+        state, _ = self.env.reset(seed=self.seed+self.episodes)
 
         preference = self.get_pref()
         z = self.preference_guided_exploration(preference)
@@ -300,12 +295,19 @@ class MORLAgent:
             prefs_batch = preference.repeat(self.inference_size, 1)
             prefs = preference.unsqueeze(0).repeat(self.inference_size, 1, 1)
 
-            B = self.backward_net(next_states_batch, prefs_batch)
-            B = B.view(self.inference_size, self.batch_size, self.z_dim)
+            if self.backward_net.used_preference:  # backward compatiblity
+                B = self.backward_net(next_states_batch, prefs_batch)
+                B = B.view(self.inference_size, self.batch_size, self.z_dim)
 
-            dot_reward = torch.einsum('isd, isd -> is', rewards, prefs)
+                dot_reward = torch.einsum('isd, isd -> is', rewards, prefs)
+                z = torch.einsum('is, isk -> sk', dot_reward, B) / self.inference_size
 
-            z = torch.einsum('is, isk -> sk', dot_reward, B) / self.inference_size
+            else:
+                B = self.backward_net(next_states, prefs_batch)
+
+                dot_reward = torch.einsum('isd, isd -> is', rewards, prefs)
+                z = torch.einsum('is, ik -> sk', dot_reward, B) / self.inference_size
+            
             z = math.sqrt(self.z_dim) * F.normalize(z, dim=1)
 
         return z
@@ -321,14 +323,11 @@ class MORLAgent:
             zs = self.preference_guided_exploration_batch(preferences)
         else:
             pref = self.get_pref()
-            z = self.preference_guided_exploration(pref)
-            zs = z.repeat(self.batch_size, 1)
-            zs = zs.to(self.device)
             preference = torch.FloatTensor(pref).to(self.device)
             preferences = preference.unsqueeze(0).repeat(self.batch_size, 1)
+            zs = self.preference_guided_exploration_batch(preferences)
 
-        self.update_fb(states, actions, rewards,
-                       next_states, dones, zs, preferences)
+        self.update_fb(states, actions, rewards, next_states, dones, zs, preferences)
 
         if self.learning_steps % self.delay_actor == 0:
             self.update_actor(states, zs)
@@ -344,7 +343,8 @@ class MORLAgent:
         actions = dist.mean
 
         F1, F2 = self.forward_net(states, zs, actions)
-        Q = torch.einsum('sd, sd -> s', F1, zs)
+        Q1, Q2 = [torch.einsum('sd, sd->s', F, zs) for F in [F1, F2]]
+        Q = torch.minimum(Q1, Q2)
 
         q_loss = -Q.mean()
 
@@ -354,7 +354,7 @@ class MORLAgent:
         actor_loss.backward()
         self.actor_optimizer.step()
 
-        if self.wandb is not None:
+        if self.wandb is not None and self.steps % 100 == 0:
             self.wandb.log(
                 {"loss/Actor_loss": actor_loss.item(),
                  "loss/Actor_Q_loss": q_loss.item(),
@@ -385,10 +385,9 @@ class MORLAgent:
 
         dones = dones.view(-1, 1)
 
-        fb_offdiag = 0.5 * sum((M - self.gamma * (1 - dones) * target_M)
-                               [off_diag].pow(2).mean() for M in [M1, M2])
+        fb_offdiag = 0.5 * sum((M - self.gamma * target_M)[off_diag].pow(2).mean() for M in [M1, M2])
 
-        fb_diag = -sum(((1-dones) * M).diag().mean() for M in [M1, M2])
+        fb_diag = -sum(M.diag().mean() for M in [M1, M2])
 
         fb_loss = fb_offdiag + fb_diag
 
@@ -427,7 +426,7 @@ class MORLAgent:
         self.f_optimizer.step()
         self.b_optimizer.step()
 
-        if self.wandb is not None:
+        if self.wandb is not None and self.steps % 100 == 0:
             self.wandb.log(
                 {"loss/FB_loss": fb_loss.item(),
                  "loss/Orth_loss": orth_loss.item(),
@@ -470,7 +469,7 @@ class MORLAgent:
 
         self.all_returns.append(returns)
 
-        if self.wandb is not None:
+        if self.wandb is not None and self.steps % 100 == 0:
             self.wandb.log(
                 {f"eval/{self.p_name[preference_index]}": dot_reward,
                  f"len/{self.p_name[preference_index]}_length": avg_length,
