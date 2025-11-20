@@ -1,11 +1,12 @@
 import mo_gymnasium
 import os
 from mo_agent import MORLAgent
+from tqdm import tqdm
 import numpy as np
 import time
-import tqdm
 import torch
 import argparse
+from environments import mo_hopper2d, mo_hopper4d, mo_humanoid5d
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--cuda_device', type=int, default=0, help='cuda device id')
@@ -13,32 +14,33 @@ parser.add_argument('--env_name', type=str, default='mo-halfcheetah-v4', help='e
 parser.add_argument('--model_name', type=str, default='', help='model name')
 parser.add_argument('--steps', type=int, default=3000000, help='model steps')
 parser.add_argument('--output_path', type=str, default='rewards/MORL-FB/output.npy', help='path for saving testing results')
+parser.add_argument('--seed', type=int, default=0)
 args = parser.parse_args()
 
 
 if __name__ == '__main__':
 
     configs = {
-        'num_steps': 3000000,
+        'num_steps': 3010000,
         'start_steps': 10000,
         'memory_size': 1000000,
         'save': True,
         'save_steps': 50000,
         'eval_steps': 10000,
-        'z_dim': 150,
-        'interface_size': 1024,
+        'z_dim': 300,
+        'interface_size': 5120,
         'hidden_dim': 1024,
         'feature_dim': 512,
-        'batch_size': 256,
+        'batch_size': 1024,
         'tau': 0.01,
         'gamma': 0.99,
         'lr': 1e-4,
-        'delay_actor': 5,
-        'update_per_step': 2,
+        'delay_actor': 10,
+        'update_per_step': 1,
         'expl_scale': 0.1,
         'policy_scale': 0.2,  # schedlue
         'clip': 0.5,  # clip on truncated normal distsibution noise
-        'q_loss_coef': 1,
+        'q_loss_coef': 1.0,
         'tuning': False,
         'memory_reward_dim': 3, # Replay buffer reward dimension, used when tuning is True
         'her': False,
