@@ -68,9 +68,9 @@ class ForwardMap(nn.Module):
 
         if self.preprocess:
             self.obs_action_net = mlp(
-                self.obs_dim + self.action_dim, hidden_dim, "ntanh", feature_dim, "layernorm", "irelu")
+                self.obs_dim + self.action_dim, hidden_dim, "ntanh", feature_dim, "irelu")
             self.obs_z_net = mlp(self.obs_dim + self.z_dim,
-                                 hidden_dim, "ntanh", feature_dim, "layernorm", "irelu")
+                                 hidden_dim, "ntanh", feature_dim, "irelu")
             if not add_trunk:
                 self.trunk: nn.Module = nn.Identity()
                 feature_dim = 2 * feature_dim
@@ -154,9 +154,9 @@ class Actor(nn.Module):
 
         if self.preprocess:
             self.obs_net = mlp(self.obs_dim, hidden_dim,
-                               "ntanh", feature_dim, "layernorm", "irelu")
+                               "ntanh", feature_dim, "irelu")
             self.obs_z_net = mlp(self.obs_dim + self.z_dim,
-                                 hidden_dim, "ntanh", feature_dim, "layernorm", "irelu")
+                                 hidden_dim, "ntanh", feature_dim, "irelu")
             if not add_trunk:
                 self.trunk: nn.Module = nn.Identity()
                 feature_dim = 2 * feature_dim
