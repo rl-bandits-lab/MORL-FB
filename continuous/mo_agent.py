@@ -19,14 +19,13 @@ class MORLAgent:
         self.action_max = self.env.action_space.high[0]
         self.action_min = self.env.action_space.low[0]
         self.reward_dim = self.env.reward_dim
-        
-        self.seed = config['seed']
-        np.random.seed(self.seed)
-        random.seed(self.seed)
-        torch.manual_seed(self.seed)
-        torch.cuda.manual_seed(self.seed)
-        torch.cuda.manual_seed_all(self.seed)
-        self.env.action_space.seed(self.seed)
+
+        np.random.seed(0)
+        random.seed(0)
+        torch.manual_seed(0)
+        torch.cuda.manual_seed(0)
+        torch.cuda.manual_seed_all(0)
+        self.env.action_space.seed(0)
 
         self.wandb = wandb
         self.save = config['save']
@@ -49,6 +48,7 @@ class MORLAgent:
         self.expl_scale = config['expl_scale']
         self.policy_scale = config['policy_scale']
         self.q_loss_coef = config['q_loss_coef']
+        self.seed = config['seed']
 
         self.tuning = config['tuning']
         self.her = config['her']
@@ -323,9 +323,11 @@ class MORLAgent:
             zs = self.preference_guided_exploration_batch(preferences)
         else:
             pref = self.get_pref()
+            z = self.preference_guided_exploration(pref)
+            zs = z.repeat(self.batch_size, 1)
+            zs = zs.to(self.device)
             preference = torch.FloatTensor(pref).to(self.device)
             preferences = preference.unsqueeze(0).repeat(self.batch_size, 1)
-            zs = self.preference_guided_exploration_batch(preferences)
 
         self.update_fb(states, actions, rewards, next_states, dones, zs, preferences)
 
@@ -385,7 +387,8 @@ class MORLAgent:
 
         dones = dones.view(-1, 1)
 
-        fb_offdiag = 0.5 * sum((M - self.gamma * target_M)[off_diag].pow(2).mean() for M in [M1, M2])
+        fb_offdiag = 0.5 * sum((M - self.gamma * (1 - dones) * target_M)
+                               [off_diag].pow(2).mean() for M in [M1, M2])
 
         fb_diag = -sum(M.diag().mean() for M in [M1, M2])
 
