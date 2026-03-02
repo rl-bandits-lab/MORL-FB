@@ -1,9 +1,0 @@
---extra-index-url https://download.pytorch.org/whl/cu118
-numpy==1.26.4
-torch==2.0.1
-gymnasium==0.29.1
-gymnasium[mujoco]==0.29.1
-mo_gymnasium==1.1.0
-pygmo
-wandb
-tqdm
