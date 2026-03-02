@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  [cite_start]<title>A REWARD-FREE VIEWPOINT ON MULTI-OBJECTIVE REINFORCEMENT LEARNING [cite: 2]</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <style>
+    .author-block {
+      display: inline-block;
+      margin-right: 20px;
+      font-size: 1.2rem;
+    }
+    .affiliation-block {
+      display: block;
+      font-size: 1.1rem;
+      margin-top: 5px;
+    }
+    .conference-block {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #363636;
+      margin-bottom: 20px;
+    }
+    .email-block {
+      font-family: monospace;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <section class="hero is-light">
+    <div class="hero-body has-text-centered">
+      <div class="container is-max-desktop">
+        <h1 class="title is-1 publication-title">
+          [cite_start]A REWARD-FREE VIEWPOINT ON MULTI-OBJECTIVE REINFORCEMENT LEARNING [cite: 2]
+        </h1>
+        
+        <div class="conference-block">
+          [cite_start]Published as a conference paper at ICLR 2026 [cite: 1]
+        </div>
+
+        <div class="is-size-5 publication-authors">
+          [cite_start]<span class="author-block">Zhang-Wei Hong* [cite: 3]</span>
+          [cite_start]<span class="author-block">Ying-Tu Chen* [cite: 4]</span>
+          [cite_start]<span class="author-block">Wei Hung*¹ [cite: 4]</span>
+          [cite_start]<span class="author-block">Bing-Shu Wu* [cite: 4]</span>
+          [cite_start]<span class="author-block">Ping-Chun Hsieh¹ [cite: 3]</span>
+        </div>
+
+        <div class="is-size-5 publication-authors affiliation-block">
+          [cite_start]<span class="author-block">National Yang Ming Chiao Tung University, Hsinchu, Taiwan [cite: 4]</span>
+          [cite_start]<span class="author-block">Massachusetts Institute of Technology [cite: 4]</span>
+        </div>
+
+        <div class="email-block">
+          [cite_start]{shu0924.cs13, pinghsieh}@nycu.edu.tw, zwhong@mit.edu [cite: 5]
+        </div>
+        
+        <div class="is-size-7 mt-3">
+          [cite_start]*Equal contribution. [cite: 15]
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          [cite_start]<h2 class="title is-3">ABSTRACT [cite: 6]</h2>
+          <div class="content has-text-justified">
+            <p>
+              [cite_start]Many sequential decision-making tasks involve optimizing multiple conflicting objectives, requiring policies that adapt to different user preferences[cite: 7]. [cite_start]In multi-objective reinforcement learning (MORL), one widely studied approach addresses this by training a single policy network conditioned on preference-weighted rewards[cite: 8]. [cite_start]In this paper, we explore a novel algorithmic perspective: leveraging reward-free reinforcement learning (RFRL) for MORL[cite: 9]. 
+            </p>
+            <p>
+              [cite_start]While RFRL has historically been studied independently of MORL, it learns optimal policies for any possible reward function, making it a natural fit for MORL's challenge of handling unknown user preferences[cite: 10]. [cite_start]We propose using the RFRL's training objective as an auxiliary task to enhance MORL, enabling more effective knowledge sharing beyond the multi-objective reward function given at training time[cite: 11]. [cite_start]To this end, we adapt a state-of-the-art RFRL algorithm to the MORL setting and introduce a preference-guided exploration strategy that focuses learning on relevant parts of the environment[cite: 12]. 
+            </p>
+            <p>
+              [cite_start]Through extensive experiments and ablation studies, we demonstrate that our approach significantly outperforms the state-of-the-art MORL methods across diverse MO-Gymnasium tasks, achieving superior performance and data efficiency[cite: 13]. [cite_start]This work provides the first systematic adaptation of RFRL to MORL, demonstrating its potential as a scalable and empirically effective solution to multi-objective policy learning[cite: 14].
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</body>
+</html>
