@@ -3,8 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  [cite_start]<title>A REWARD-FREE VIEWPOINT ON MULTI-OBJECTIVE REINFORCEMENT LEARNING [cite: 2]</title>
+  <title>A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
   <style>
     .author-block {
       display: inline-block;
@@ -22,10 +23,16 @@
       color: #363636;
       margin-bottom: 20px;
     }
-    .email-block {
-      font-family: monospace;
-      margin-top: 10px;
+    .footnote-block {
+      font-size: 0.9rem;
+      text-align: center;
+      margin-top: 1.5rem;
+      line-height: 1.6;
     }
+       .has-text-link:hover {
+         text-decoration: underline;
+         color: #23527c; /* Optional: makes the blue slightly darker on hover */
+       }
   </style>
 </head>
 <body>
@@ -33,58 +40,158 @@
   <section class="hero is-light">
     <div class="hero-body has-text-centered">
       <div class="container is-max-desktop">
-        <h1 class="title is-1 publication-title">
-          [cite_start]A REWARD-FREE VIEWPOINT ON MULTI-OBJECTIVE REINFORCEMENT LEARNING [cite: 2]
+        <h1 class="title is-2 publication-title">
+          A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning
         </h1>
-        
-        <div class="conference-block">
-          [cite_start]Published as a conference paper at ICLR 2026 [cite: 1]
-        </div>
 
         <div class="is-size-5 publication-authors">
-          [cite_start]<span class="author-block">Zhang-Wei Hong* [cite: 3]</span>
-          [cite_start]<span class="author-block">Ying-Tu Chen* [cite: 4]</span>
-          [cite_start]<span class="author-block">Wei Hung*¹ [cite: 4]</span>
-          [cite_start]<span class="author-block">Bing-Shu Wu* [cite: 4]</span>
-          [cite_start]<span class="author-block">Ping-Chun Hsieh¹ [cite: 3]</span>
+          <span class="author-block">
+              <a href="FIRST AUTHOR PERSONAL LINK" class="has-text-link" target="_blank">Ying-Tu Chen<sup>1*</sup></a>,
+          </span>
+          <span class="author-block">
+              <a href="SECOND AUTHOR PERSONAL LINK" class="has-text-link" target="_blank">Wei Hung<sup>1*</sup></a>,
+          </span>
+          <span class="author-block">
+              <a href="THIRD AUTHOR PERSONAL LINK" class="has-text-link" target="_blank">Bing-Shu Wu<sup>1*</sup></a>,
+          </span>
+          <span class="author-block">
+              <a href="https://williamd4112.github.io/" class="has-text-link" target="_blank">Zhang-Wei Hong<sup>2</sup></a>,
+          </span>
+          <span class="author-block">
+              <a href="https://pinghsieh.github.io/" class="has-text-link" target="_blank">Ping-Chun Hsieh<sup>1</sup></a>
+          </span>
         </div>
 
         <div class="is-size-5 publication-authors affiliation-block">
-          [cite_start]<span class="author-block">National Yang Ming Chiao Tung University, Hsinchu, Taiwan [cite: 4]</span>
-          [cite_start]<span class="author-block">Massachusetts Institute of Technology [cite: 4]</span>
+          <span class="author-block"><sup>1</sup>National Yang Ming Chiao Tung University, Hsinchu, Taiwan</span><br>
+          <span class="author-block"><sup>2</sup>Massachusetts Institute of Technology</span><br>
+                  <span class="footnote-block"><sup>*</sup>Equal Contribution</span>
         </div>
 
-        <div class="email-block">
-          [cite_start]{shu0924.cs13, pinghsieh}@nycu.edu.tw, zwhong@mit.edu [cite: 5]
-        </div>
-        
-        <div class="is-size-7 mt-3">
-          [cite_start]*Equal contribution. [cite: 15]
-        </div>
+        <div class="column has-text-centered">
+            <div class="publication-links">
+                <!-- Arxiv PDF link -->
+                <span class="link-block">
+                    <a href="https://openreview.net/pdf?id=IwiwmY3Mzz" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>Paper</span>
+                    </a>
+                </span>
+
+                <!-- Github link -->
+                <span class="link-block">
+                    <a href="https://github.com/rl-bandits-lab/MORL-FB" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fab fa-github"></i>
+                        </span>
+                    <span>Code</span>
+                    </a>
+                </span>
+	    </div>
+	</div>
+
       </div>
     </div>
   </section>
 
   <section class="section">
     <div class="container is-max-desktop">
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          [cite_start]<h2 class="title is-3">ABSTRACT [cite: 6]</h2>
+      
+      <div class="columns is-centered">
+        <div class="column is-full">
+          <h2 class="title is-3 has-text-centered">Abstract</h2>
           <div class="content has-text-justified">
             <p>
-              [cite_start]Many sequential decision-making tasks involve optimizing multiple conflicting objectives, requiring policies that adapt to different user preferences[cite: 7]. [cite_start]In multi-objective reinforcement learning (MORL), one widely studied approach addresses this by training a single policy network conditioned on preference-weighted rewards[cite: 8]. [cite_start]In this paper, we explore a novel algorithmic perspective: leveraging reward-free reinforcement learning (RFRL) for MORL[cite: 9]. 
+              Many sequential decision-making tasks involve optimizing multiple conflicting objectives, requiring policies that adapt to different user preferences. In multi-objective reinforcement learning (MORL), one widely studied approach addresses this by training a single policy network conditioned on preference-weighted rewards. In this paper, we explore a novel algorithmic perspective: leveraging reward-free reinforcement learning (RFRL) for MORL.
             </p>
             <p>
-              [cite_start]While RFRL has historically been studied independently of MORL, it learns optimal policies for any possible reward function, making it a natural fit for MORL's challenge of handling unknown user preferences[cite: 10]. [cite_start]We propose using the RFRL's training objective as an auxiliary task to enhance MORL, enabling more effective knowledge sharing beyond the multi-objective reward function given at training time[cite: 11]. [cite_start]To this end, we adapt a state-of-the-art RFRL algorithm to the MORL setting and introduce a preference-guided exploration strategy that focuses learning on relevant parts of the environment[cite: 12]. 
+              While RFRL has historically been studied independently of MORL, it learns optimal policies for any possible reward function, making it a natural fit for MORL's challenge of handling unknown user preferences. We propose using the RFRL's training objective as an auxiliary task to enhance MORL, enabling more effective knowledge sharing beyond the multi-objective reward function given at training time. To this end, we adapt a state-of-the-art RFRL algorithm to the MORL setting and introduce a preference-guided exploration strategy that focuses learning on relevant parts of the environment.
             </p>
             <p>
-              [cite_start]Through extensive experiments and ablation studies, we demonstrate that our approach significantly outperforms the state-of-the-art MORL methods across diverse MO-Gymnasium tasks, achieving superior performance and data efficiency[cite: 13]. [cite_start]This work provides the first systematic adaptation of RFRL to MORL, demonstrating its potential as a scalable and empirically effective solution to multi-objective policy learning[cite: 14].
+              Through extensive experiments and ablation studies, we demonstrate that our approach significantly outperforms the state-of-the-art MORL methods across diverse MO-Gymnasium tasks, achieving superior performance and data efficiency. This work provides the first systematic adaptation of RFRL to MORL, demonstrating its potential as a scalable and empirically effective solution to multi-objective policy learning.
             </p>
           </div>
         </div>
       </div>
+
+      <div class="columns is-centered mt-5">
+        <div class="column is-full">
+          <h2 class="title is-3 has-text-centered">Method Overview</h2>
+          <div class="content has-text-justified">
+            <p>
+              We reframe MORL as a special case of RFRL by adopting a Forward-Backward (FB) representation. The posterior reward function is provided as R(&lambda;) = &lambda;<sup>T</sup>r(s,a). Our method, <strong>MORL-FB</strong>, introduces two core designs to enhance training and exploration:
+            </p>
+            <ul>
+              <li><strong>Preference-Guided Exploration (PG-Explore):</strong> Instead of sampling from a standard Gaussian distribution, we sample preferences from a unit simplex during training to calculate a projection variable <em>z<sub>&lambda;</sub></em>. This variable effectively guides both exploration and network updates, requiring no additional samples to compute during testing.</li>
+              <li><strong>Auxiliary Q Loss:</strong> Since the reward function is known during training, we construct the Q loss directly from observed rewards (&lambda;<sup>T</sup>r) rather than relying on pseudo rewards.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="columns is-centered mt-5">
+        <div class="column is-full">
+          <h2 class="title is-3 has-text-centered">Experiments & Results</h2>
+          <div class="content has-text-justified">
+            <p>
+              We evaluated <strong>MORL-FB</strong> across diverse Multi-Objective MuJoCo domains (HalfCheetah2d, Walker2d, Hopper3d, Ant3d, Humanoid2d, and Humanoid5d) and measured its performance against state-of-the-art baselines (PD-MORL, Q-Pensieve, CAPQL, PG-MORL, etc.) using Utility (UT), Hypervolume (HV), and Episodic Dominance (ED).
+            </p>
+            <p><strong>Key Highlights:</strong></p>
+            <ul>
+              <li><strong>Higher Sample Efficiency:</strong> MORL-FB consistently achieves superior performance and data efficiency across all benchmarked environments.</li>
+              <li><strong>Generalizability:</strong> Our method can generalize effectively over the entire preference set, even when trained on a heavily reduced subset of preference vectors (e.g., [1,0,0], [0,1,0], [0,0,1], [1/3, 1/3, 1/3]).</li>
+              <li><strong>Zero-Shot Transfer:</strong> We demonstrated effective zero-shot cross-objective transfer (e.g., transferring from 2D Hopper directly to 3D and 4D objectives), showcasing the robustness of the learned FB representations.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      	<pre><code>
+	@inproceedings{
+        	chen2026morlfb,
+        	title={A Reward-Free Viewpoint on Multi-Objective Reinforcement Learning},
+        	author={Ying-Tu Chen and Wei Hung and Bing-Shu Wu and Zhang-Wei Hong and Ping-Chun Hsieh},
+        	booktitle={The Fourteenth International Conference on Learning Representations},
+        	year={2026},
+        	url={https://openreview.net/forum?id=IwiwmY3Mzz},
+        }
+	</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+
 
 </body>
 </html>
